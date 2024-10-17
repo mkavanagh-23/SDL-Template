@@ -9,7 +9,6 @@ namespace Settings {
 
     //Animation
     constexpr int FPS = 30;                 //Frame per second
-    constexpr int FRAME_DELAY = 200/FPS;    //Frame delay time
 
     //Background Music
     constexpr std::string_view BG_MUSIC{"relative/path/to/music.wav"};
