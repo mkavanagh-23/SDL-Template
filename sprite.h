@@ -45,53 +45,20 @@ class Sprite {
         //Movement variables
         int currentSpeed;                   //How many pixels to move the sprite by
         Direction currentDirection{still};         //Current direction of motion
+
     public:
     //Constructors
         //Delete the default, we at least need a file path!
         Sprite() = delete;
-        //No transparency sprite object
-        Sprite(const char* filePath)
-            : PATH{filePath}
-        {
-            //Crerate temp surface from bitmap
-            tempSurface = LoadImage(PATH);
-            //Load surface into a texture
-            texture = LoadTexture();
-            //Get width and height of texture
-            SDL_QueryTexture(texture, NULL, NULL, &rectPlacement.w, &rectPlacement.h);
-            width = rectPlacement.w;
-            height = rectPlacement.h;
-            //Fill the rectangle wih the texture
-            FillRect(rectPlacement, x, y);
-        }
-        //Transparent sprite objects
-        Sprite(const char* filePath, RGB colorKey)
-            : PATH{filePath}, TRANSPARENCY_MASK{colorKey}
-        {
-            //Crerate temp surface from bitmap
-            tempSurface = LoadImage(PATH);
-            //Set transparent color
-            setTransparentColor();
-            //Load surface into a texture and free the surface
-            texture = LoadTexture();
-            //Get width and height of texture
-            SDL_QueryTexture(texture, NULL, NULL, &rectPlacement.w, &rectPlacement.h);
-            width = rectPlacement.w;
-            height = rectPlacement.h;
-            //Fill the rectangle wih the texture
-            FillRect(rectPlacement, x, y);
-        }
-        //Transparent sprite object
-        Sprite(const char* filePath, std::string colorHex)
-            : Sprite(filePath, HexToRGB(colorHex))  //Convert hex to RGB to use in 
-        {}
-    
-    //Destructor
-        ~Sprite()
-        {
-            PATH = NULL;
-            SDL_DestroyTexture(texture);
-        }
+        //No transparency
+        Sprite(const char* filePath);
+        //Transparency
+        Sprite(const char* filePath, RGB colorKey);
+        Sprite(const char* filePath, std::string colorHex);
+        
+        //Destructor
+        ~Sprite();
+
     protected:
         //Function Prototypes
         void FillRect(SDL_Rect& rect, int xLocation, int yLocation);
@@ -129,7 +96,7 @@ class AnimatedSprite : public Sprite {      //Inherits from class "Sprite"
         SDL_Texture* textureSheetDown;      //Pointer to texture for "Down" animation     
         SDL_Texture* textureSheetLeft;      //Pointer to texture for "Left" animation     
 
-        //Rectangles - MAKE SURE TO SET WIDTHS/HEIGHTS!!!!
+        //Rectangles - MAKE SURE TO SET WIDTHS/HEIGHTS IN CONSTRUCTOR!!!!
         SDL_Rect rectSheet;                 //Rectangle for current player direction sheet
         SDL_Rect rectSheetUp;               //Rectangle for upward sheet
         SDL_Rect rectSheetRight;            //Rectangle for right sheet

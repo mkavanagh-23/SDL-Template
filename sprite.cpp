@@ -7,6 +7,53 @@
 
 SDL_Surface* Sprite::tempSurface{NULL};
 
+//Constructors
+//No transparency sprite object
+Sprite::Sprite(const char* filePath)
+    : PATH{filePath}
+{
+    //Crerate temp surface from bitmap
+    tempSurface = LoadImage(PATH);
+    //Load surface into a texture
+    texture = LoadTexture();
+    //Get width and height of texture
+    SDL_QueryTexture(texture, NULL, NULL, &rectPlacement.w, &rectPlacement.h);
+    width = rectPlacement.w;
+    height = rectPlacement.h;
+    //Fill the rectangle wih the texture
+    FillRect(rectPlacement, x, y);
+}
+
+//Transparent sprite objects
+Sprite::Sprite(const char* filePath, RGB colorKey)
+    : PATH{filePath}, TRANSPARENCY_MASK{colorKey}
+{
+    //Crerate temp surface from bitmap
+    tempSurface = LoadImage(PATH);
+    //Set transparent color
+    setTransparentColor();
+    //Load surface into a texture and free the surface
+    texture = LoadTexture();
+    //Get width and height of texture
+    SDL_QueryTexture(texture, NULL, NULL, &rectPlacement.w, &rectPlacement.h);
+    width = rectPlacement.w;
+    height = rectPlacement.h;
+    //Fill the rectangle wih the texture
+    FillRect(rectPlacement, x, y);
+}
+
+//Transparent sprite object
+Sprite::Sprite(const char* filePath, std::string colorHex)
+    : Sprite::Sprite(filePath, HexToRGB(colorHex))  //Convert hex to RGB to use in constructor
+{}
+    
+//Destructor
+Sprite::~Sprite()
+{
+    PATH = NULL;
+    SDL_DestroyTexture(texture);
+}
+
 RGB Sprite::HexToRGB(const std::string& hex) {
     //Create temporary color objects
     std::string hexColor = hex;
