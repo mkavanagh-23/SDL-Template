@@ -44,7 +44,7 @@ class Sprite {
 
         //Movement variables
         int currentSpeed;                   //How many pixels to move the sprite by
-        Direction currentDirection;         //Current direction of motion
+        Direction currentDirection{still};         //Current direction of motion
     public:
     //Constructors
         //Delete the default, we at least need a file path!
@@ -62,7 +62,7 @@ class Sprite {
             width = rectPlacement.w;
             height = rectPlacement.h;
             //Fill the rectangle wih the texture
-            FillRect();
+            FillRect(rectPlacement, x, y);
         }
         //Transparent sprite objects
         Sprite(const char* filePath, RGB colorKey)
@@ -79,7 +79,7 @@ class Sprite {
             width = rectPlacement.w;
             height = rectPlacement.h;
             //Fill the rectangle wih the texture
-            FillRect();
+            FillRect(rectPlacement, x, y);
         }
         //Transparent sprite object
         Sprite(const char* filePath, std::string colorHex)
@@ -94,13 +94,14 @@ class Sprite {
         }
     protected:
         //Function Prototypes
-        virtual void FillRect();
+        virtual void FillRect(SDL_Rect& rect, int xLocation, int yLocation);
         SDL_Surface* LoadImage(const char* path);
         SDL_Texture* LoadTexture();
         void setTransparentColor();
         RGB HexToRGB(const std::string& hex);   //Convert hex color codes to RGB color object
-        void updateDirection();
-        void move();
+        virtual void setDirection(const uint8_t* keys);
+        virtual void move();
+        void keepInBounds();
     private:
 };
 
@@ -128,7 +129,7 @@ class AnimatedSprite : public Sprite {      //Inherits from class "Sprite"
         SDL_Texture* textureSheetDown;      //Pointer to texture for "Down" animation     
         SDL_Texture* textureSheetLeft;      //Pointer to texture for "Left" animation     
 
-        //Rectangles
+        //Rectangles - MAKE SURE TO SET WIDTHS/HEIGHTS!!!!
         SDL_Rect rectSheet;                 //Rectangle for current player direction sheet
         SDL_Rect rectSheetUp;               //Rectangle for upward sheet
         SDL_Rect rectSheetRight;            //Rectangle for right sheet
@@ -143,8 +144,13 @@ class AnimatedSprite : public Sprite {      //Inherits from class "Sprite"
         SDL_Rect tempRect;                  //Rectangle to hold single sprite before moving to rectPlacement
 
         //Animation variables
-        const int numFrames;                      //Holds number of frames in current strip
+        int numFrames;               //Holds number of frames in current strip
         int currentFrame{0};               //Current frame in animation strip
+        int frameCounter{0};
+
+        //Function prototypes
+        void setDirection(const uint8_t* keys);
+        void move();
 };
 
 #endif
