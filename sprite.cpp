@@ -2,12 +2,14 @@
 #include <SDL2/SDL_surface.h>
 #include <string>
 #include <iostream>
+#include <cassert>
 
 SDL_Surface* Sprite::tempSurface{NULL};
 
 RGB Sprite::HexToRGB(const std::string& hex) {
     //Create temporary color objects
     std::string hexColor = hex;
+    assert(hexColor.length() == 6 && "Provided colorKey not a valid hex code.\n");
     RGB rgbColor;
 
     //Extract sets of two characters and convert to RGB values
@@ -36,6 +38,15 @@ SDL_Texture* Sprite::LoadTexture() {
 
     SDL_FreeSurface(tempSurface);
     return newTexture;
+}
+
+void Sprite::setTransparentColor(){
+    //Create the colorkey
+    uint32_t colorKey;
+    colorKey = SDL_MapRGB(tempSurface->format, TRANSPARENCY_MASK.r, TRANSPARENCY_MASK.g, TRANSPARENCY_MASK.b);
+
+    //Set colorkey as transparent color
+    SDL_SetColorKey(tempSurface, SDL_TRUE, colorKey);
 }
 
 void Sprite::FillRect() {

@@ -64,10 +64,28 @@ class Sprite {
             //Fill the rectangle wih the texture
             FillRect();
         }
+        //Transparent sprite objects
+        Sprite(const char* filePath, RGB colorKey)
+            : PATH{filePath}, TRANSPARENCY_MASK{colorKey}
+        {
+            //Crerate temp surface from bitmap
+            tempSurface = LoadImage(PATH);
+            //Set transparent color
+            setTransparentColor();
+            //Load surface into a texture and free the surface
+            texture = LoadTexture();
+            //Get width and height of texture
+            SDL_QueryTexture(texture, NULL, NULL, &rectPlacement.w, &rectPlacement.h);
+            width = rectPlacement.w;
+            height = rectPlacement.h;
+            //Fill the rectangle wih the texture
+            FillRect();
+        }
         //Transparent sprite object
         Sprite(const char* filePath, std::string colorHex)
-            : PATH{filePath}
+            : Sprite(filePath, HexToRGB(colorHex))  //Convert hex to RGB to use in 
         {}
+    
     //Destructor
         ~Sprite()
         {
@@ -79,7 +97,7 @@ class Sprite {
         virtual void FillRect();
         SDL_Surface* LoadImage(const char* path);
         SDL_Texture* LoadTexture();
-        SDL_Surface* setTransparentColor();
+        void setTransparentColor();
         RGB HexToRGB(const std::string& hex);   //Convert hex color codes to RGB color object
         void updateDirection();
         void move();
