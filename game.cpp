@@ -32,6 +32,18 @@ bool InitMusic() {
 bool ProgramIsRunning();
 void CreateGameImages();
 void RunGame();
-void DrawGame();
+
+void DrawGame() {
+    //Clear the window
+    SDL_RenderClear(renderer);
+    //Copy the background
+    SDL_RenderCopy(renderer, background.texture, NULL, &background.rectPlacement);
+    //Copy the sprite
+    SDL_RenderCopy(renderer, sprite.texture, &sprite.tempRect, &sprite.rectPlacement);
+    //display the game screen with updated position of Zombie
+    SDL_RenderPresent(renderer);
+    SDL_Delay(5);  //delay a bit
+}
+
 void ResetGame();
 void CloseShop();
