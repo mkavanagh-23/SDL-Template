@@ -1,11 +1,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 #include <iostream>
-#include "settings.h"
-#include "sprite.h"
 #include "game.h"
 using namespace std;
-
 
 int main(int argc, char* argv[]) {
 
@@ -18,6 +15,8 @@ int main(int argc, char* argv[]) {
     //Create all game images
     CreateGameImages();
 
+    //Set sprite properties
+
     //Load background music
     if(!InitMusic()) {
         std::cout <<"Music failed to load!\n";
@@ -26,10 +25,12 @@ int main(int argc, char* argv[]) {
     //Begin Game Loop
     while(ProgramIsRunning()) {
         //Check for input
-        const Uint8* keys = SDL_GetKeyboardState(NULL); //Pass a reference to the keypresses
+        const uint8_t* keys = SDL_GetKeyboardState(NULL); //Pass the keypresses
 
         //Update sprite states
+
         //Draw the screen
+
 
     }//End Game Loop
 
