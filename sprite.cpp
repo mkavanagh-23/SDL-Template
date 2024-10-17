@@ -51,8 +51,8 @@ void Sprite::setTransparentColor(){
 }
 
 void Sprite::FillRect(SDL_Rect& rect, int xLocation, int yLocation) {
-    rect.x = x;
-    rect.y = y;
+    rect.x = xLocation;
+    rect.y = yLocation;
 }
 
 void Sprite::setDirection(const uint8_t* keys){
@@ -110,7 +110,32 @@ void AnimatedSprite::setDirection(const uint8_t* keys){
 }
 
 void Sprite::move() {
-
+    if(currentDirection == up) {
+        //Move the sprite up
+        y -= currentSpeed;
+        //Check for screen edge collision
+        keepInBounds();
+    }
+    if(currentDirection == right) {
+        //Move the sprite up
+        x += currentSpeed;
+        //Check for screen edge collision
+        keepInBounds();
+    }
+    if(currentDirection == down) {
+        //Move the sprite up
+        y += currentSpeed;
+        //Check for screen edge collision
+        keepInBounds();
+    }
+    if(currentDirection == left) {
+        //Move the sprite up
+        x -= currentSpeed;
+        //Check for screen edge collision
+        keepInBounds();
+    }
+    //Create rectangle for sprite placement
+    FillRect(rectPlacement, x, y);
 }
 
 void AnimatedSprite::move() {
@@ -131,16 +156,12 @@ void AnimatedSprite::move() {
     if(currentDirection == up) {
         //Advance rectangle to current frame on sheet
         rectUp.x = currentFrame * rectUp.w;
-
         //Move the sprite up
         y -= currentSpeed;
-
         //Check for screen edge collision
         keepInBounds();
-
         //Create temp rectangle to hold the current sprite
         FillRect(tempRect, rectUp.x, rectUp.y);
-        
         //Load the proper texture
         texture = textureSheetUp;
     }
@@ -148,16 +169,12 @@ void AnimatedSprite::move() {
     if(currentDirection == right) {
         //Advance rectangle to current frame on sheet
         rectRight.x = currentFrame * rectRight.w;
-
         //Move the sprite right
         x += currentSpeed;
-
         //Check for screen edge collision
         keepInBounds();
-
         //Create temp rectangle to hold the current sprite
         FillRect(tempRect, rectRight.x, rectRight.y);
-        
         //Load the proper texture
         texture = textureSheetRight;
     }
@@ -165,16 +182,12 @@ void AnimatedSprite::move() {
     if(currentDirection == down) {
         //Advance rectangle to current frame on sheet
         rectDown.x = currentFrame * rectDown.w;
-
         //Move the sprite down
         y += currentSpeed;
-
         //Check for screen edge collision
         keepInBounds();
-
         //Create temp rectangle to hold the current sprite
         FillRect(tempRect, rectDown.x, rectDown.y);
-        
         //Load the proper texture
         texture = textureSheetDown;
     }
@@ -182,16 +195,12 @@ void AnimatedSprite::move() {
     if(currentDirection == left) {
         //Advance rectangle to current frame on sheet
         rectLeft.x = currentFrame * rectLeft.w;
-
         //Move the sprite up
         x -= currentSpeed;
-
         //Check for screen edge collision
         keepInBounds();
-
         //Create temp rectangle to hold the current sprite
         FillRect(tempRect, rectLeft.x, rectLeft.y);
-        
         //Load the proper texture
         texture = textureSheetLeft;
     }

@@ -94,7 +94,7 @@ class Sprite {
         }
     protected:
         //Function Prototypes
-        virtual void FillRect(SDL_Rect& rect, int xLocation, int yLocation);
+        void FillRect(SDL_Rect& rect, int xLocation, int yLocation);
         SDL_Surface* LoadImage(const char* path);
         SDL_Texture* LoadTexture();
         void setTransparentColor();
