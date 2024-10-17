@@ -16,8 +16,31 @@ int scorePlayer1{0};
 int scorePlayer2{0};
 
 //Function prototypes
-bool InitSDL();
-bool InitGame();
+bool InitSDL() {
+     //Initialize SDL
+    if(SDL_Init(SDL_INIT_EVERYTHING) < 0)
+    {
+        printf("SDL failed to initialize!\n");
+        SDL_Quit();
+    }
+    //Init audio subsystem
+    if(Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) == -1)
+    {
+        printf("Open Audio failed to initialize!\n");
+        return false;
+    }
+    return true;
+}
+
+bool InitGame() {
+    //Init SDL
+    if(!InitSDL())
+        return false;
+
+    //Initiatialize game variables
+    return true;
+}
+
 
 bool InitMusic() {
     //Load background music
@@ -29,7 +52,18 @@ bool InitMusic() {
     return true;    
 }
 
-bool ProgramIsRunning();
+bool ProgramIsRunning() {
+    SDL_Event event;
+    bool running = true;
+
+    while(SDL_PollEvent(&event))
+    {
+        if(event.type == SDL_QUIT)
+            running = false;
+    }
+    return running;
+};
+
 void CreateGameImages();
 void RunGame();
 
