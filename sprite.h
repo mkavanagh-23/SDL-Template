@@ -48,41 +48,44 @@ class Sprite {
 
     public:
     //Constructors
-        //Delete the default, we at least need a file path!
-        Sprite() = delete;
+        //Default constructor
+        Sprite();
         //No transparency
         Sprite(const char* filePath);
         //Transparency
         Sprite(const char* filePath, RGB colorKey);
         Sprite(const char* filePath, std::string colorHex);
         
-        //Destructor
+    //Destructor
         ~Sprite();
 
     protected:
         //Function Prototypes
-        void FillRect(SDL_Rect& rect, int xLocation, int yLocation);
-        SDL_Surface* LoadImage(const char* path);
-        SDL_Texture* LoadTexture();
-        void setTransparentColor();
-        RGB HexToRGB(const std::string& hex);   //Convert hex color codes to RGB color object
-        virtual void setDirection(const uint8_t* keys);
-        virtual void move();
-        void keepInBounds();
+        void FillRect(SDL_Rect& rect, int xLocation, int yLocation);    //Create a rectangle at the given position
+        SDL_Surface* LoadImage(const char* path);                   //Load image onto surface
+        SDL_Texture* LoadTexture();                              //Load surface onto texture
+        void setTransparentColor();                              //Set transparency
+        RGB HexToRGB(const std::string& hex);                   //Convert hex color codes to RGB color object
+        void keepInBounds();                            //Check for border collision and move to edge
+
+        virtual void setDirection(const uint8_t* keys);         //Set the sprite's current direction
+        virtual void move();                                //move the sprite
+    
+    private:
+        void create();
+        void createTransparent();
+
     private:
 };
 
 //And some additional members if the sprite is animated
-class AnimatedSprite : public Sprite {      //Inherits from class "Sprite"
+class AnimatedSprite 
+: public Sprite {      //Inherits from class "Sprite"
     public:
     private:
         //Instantiate FRAME_DELAY on a per-sprite basis to control animation speed
         const int FRAME_DELAY {200 / Settings::FPS};
         const int NUM_FRAMES{};         //Total number of frames for generic sprite
-        const int NUM_FRAMES_UP{};      //Total number of frames in "Up" sprite strip
-        const int NUM_FRAMES_RIGHT{};   //Total number of frames in "Right" sprite strip
-        const int NUM_FRAMES_DOWN{};    //Total number of frames in "Down" sprite strip
-        const int NUM_FRAMES_LEFT{};    //Total number of frames in "Left" sprite strip
 
         //File paths
         const char* PATH_SHEET_UP{NULL};
@@ -112,12 +115,28 @@ class AnimatedSprite : public Sprite {      //Inherits from class "Sprite"
 
         //Animation variables
         int numFrames;               //Holds number of frames in current strip
-        int currentFrame{0};               //Current frame in animation strip
-        int frameCounter{0};
+        int currentFrame{0};         //Current frame in animation strip
+        int frameCounter{0};         //frame delay
+        int sheetWidth, sheetHeight;
+
+        //Constructors
+        AnimatedSprite() = delete;
+
+        //No transparency
+        AnimatedSprite(const char* filepathUp, const char* filepathRight, const char* filepathDown, const char* filepathLeft, const int numFrames);
+
+        //Transparency
+        AnimatedSprite(const char* filepathUp, const char* filepathRight, const char* filepathDown, const char* filepathLeft, const int numFrames, RGB colorKey);
+        AnimatedSprite(const char* filepathUp, const char* filepathRight, const char* filepathDown, const char* filepathLeft, const int numFrames, std::string colorHex);
+
+        //Destructor
+        ~AnimatedSprite();
 
         //Function prototypes
         void setDirection(const uint8_t* keys);
         void move();
+        void create(const char* filepath, SDL_Texture* texture, SDL_Rect& rectSheet, SDL_Rect& rectSprite);
+        void createTransparent(const char* filepath, SDL_Rect& rectSheet, SDL_Rect& rectSprite);
 };
 
 #endif

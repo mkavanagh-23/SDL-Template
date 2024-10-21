@@ -1,6 +1,9 @@
 #include "sprite.h"
 #include "settings.h"
+#include <SDL2/SDL_rect.h>
+#include <SDL2/SDL_render.h>
 #include <SDL2/SDL_surface.h>
+#include <cstddef>
 #include <string>
 #include <iostream>
 #include <cassert>
@@ -12,34 +15,14 @@ SDL_Surface* Sprite::tempSurface{NULL};
 Sprite::Sprite(const char* filePath)
     : PATH{filePath}
 {
-    //Crerate temp surface from bitmap
-    tempSurface = LoadImage(PATH);
-    //Load surface into a texture
-    texture = LoadTexture();
-    //Get width and height of texture
-    SDL_QueryTexture(texture, NULL, NULL, &rectPlacement.w, &rectPlacement.h);
-    width = rectPlacement.w;
-    height = rectPlacement.h;
-    //Fill the rectangle wih the texture
-    FillRect(rectPlacement, x, y);
+    create();
 }
 
 //Transparent sprite objects
 Sprite::Sprite(const char* filePath, RGB colorKey)
     : PATH{filePath}, TRANSPARENCY_MASK{colorKey}
 {
-    //Crerate temp surface from bitmap
-    tempSurface = LoadImage(PATH);
-    //Set transparent color
-    setTransparentColor();
-    //Load surface into a texture and free the surface
-    texture = LoadTexture();
-    //Get width and height of texture
-    SDL_QueryTexture(texture, NULL, NULL, &rectPlacement.w, &rectPlacement.h);
-    width = rectPlacement.w;
-    height = rectPlacement.h;
-    //Fill the rectangle wih the texture
-    FillRect(rectPlacement, x, y);
+    createTransparent();
 }
 
 //Transparent sprite object
@@ -52,6 +35,31 @@ Sprite::~Sprite()
 {
     PATH = NULL;
     SDL_DestroyTexture(texture);
+}
+
+//Constructors
+//No transparency
+AnimatedSprite::AnimatedSprite(const char* filepathUp, const char* filepathRight, const char* filepathDown, const char* filepathLeft, const int numFrames)
+    : Sprite(), PATH_SHEET_UP{filepathUp}, PATH_SHEET_RIGHT{filepathRight}, PATH_SHEET_DOWN{filepathDown}, PATH_SHEET_LEFT{filepathLeft}, NUM_FRAMES{numFrames}
+{
+    //Create up
+    create(filepathUp, textureSheetUp, rectSheetUp, rectUp);
+    //Create right
+    //Create down
+    //Create left
+}
+
+//Transparency
+AnimatedSprite::AnimatedSprite(const char* filepathUp, const char* filepathRight, const char* filepathDown, const char* filepathLeft, const int numFrames, RGB colorKey) {
+
+}
+AnimatedSprite::AnimatedSprite(const char* filepathUp, const char* filepathRight, const char* filepathDown, const char* filepathLeft, const int numFrames, std::string colorHex) {
+
+}
+
+//Destructor
+AnimatedSprite::~AnimatedSprite() {
+    
 }
 
 RGB Sprite::HexToRGB(const std::string& hex) {
@@ -71,7 +79,7 @@ RGB Sprite::HexToRGB(const std::string& hex) {
 SDL_Surface* Sprite::LoadImage(const char* path) {
     tempSurface = SDL_LoadBMP(path);
     if(tempSurface == NULL) {
-        std::cout << "Unable to load image from path: " << path << '\n';
+        std::cout << "Unable to load image from path: \"" << path << "\"\n";
     }
     return tempSurface;
 }
@@ -102,6 +110,46 @@ void Sprite::FillRect(SDL_Rect& rect, int xLocation, int yLocation) {
     rect.y = yLocation;
 }
 
+void Sprite::create() {
+    //Crerate temp surface from bitmap
+    tempSurface = LoadImage(PATH);
+    //Load surface into a texture
+    texture = LoadTexture();
+    //Get width and height of texture
+    SDL_QueryTexture(texture, NULL, NULL, &rectPlacement.w, &rectPlacement.h);
+    width = rectPlacement.w;
+    height = rectPlacement.h;
+    //Fill the rectangle wih the texture
+    FillRect(rectPlacement, x, y);
+}
+
+void Sprite::createTransparent() {
+    //Crerate temp surface from bitmap
+    tempSurface = LoadImage(PATH);
+    //Set transparency mask
+    setTransparentColor();
+    //Load surface into a texture
+    texture = LoadTexture();
+    //Get width and height of texture
+    SDL_QueryTexture(texture, NULL, NULL, &rectPlacement.w, &rectPlacement.h);
+    width = rectPlacement.w;
+    height = rectPlacement.h;
+    //Fill the rectangle wih the texture
+    FillRect(rectPlacement, x, y);
+}
+
+void AnimatedSprite::create(const char* filepath, SDL_Texture* texture, SDL_Rect& rectSheet, SDL_Rect& rectSprite) {
+    tempSurface = LoadImage(filepath);
+    //Create a texture from the surface
+    texture = LoadTexture();
+    //Get the width and height of the texture sheet
+    SDL_QueryTexture(texture, NULL, NULL, &rectSheet.w, &rectSheet.h);
+    width = rectSheetUp.w / NUM_FRAMES;
+    height = rectSheetUp.h;
+    //Create the rectangle for upward-facing sprite
+    FillRect(rectSprite, x, y);
+}
+
 void Sprite::setDirection(const uint8_t* keys){
     if(keys[SDL_SCANCODE_UP]) {
         if(currentDirection != up) {
@@ -129,28 +177,28 @@ void AnimatedSprite::setDirection(const uint8_t* keys){
     if(keys[SDL_SCANCODE_UP]) {
         if(currentDirection != up) {
             currentDirection = up;
-            numFrames = NUM_FRAMES_UP;
+//            numFrames = NUM_FRAMES_UP;
             currentFrame = 0;
         }
     }
     if(keys[SDL_SCANCODE_RIGHT]) {
         if(currentDirection != right) {
             currentDirection = right;
-            numFrames = NUM_FRAMES_RIGHT;
+//            numFrames = NUM_FRAMES_RIGHT;
             currentFrame = 0;
         }
     }
     if(keys[SDL_SCANCODE_DOWN]) {
         if(currentDirection != down) {
             currentDirection = down;
-            numFrames = NUM_FRAMES_DOWN;
+//            numFrames = NUM_FRAMES_DOWN;
             currentFrame = 0;
         }
     }
     if(keys[SDL_SCANCODE_LEFT]) {
         if(currentDirection != left) {
             currentDirection = left;
-            numFrames = NUM_FRAMES_LEFT;
+//            numFrames = NUM_FRAMES_LEFT;
             currentFrame = 0;
         }
     }
