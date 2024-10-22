@@ -12,9 +12,6 @@ int main(int argc, char* argv[]) {
         CloseShop();
     }
 
-    //Create all game images
-    CreateGameImages();
-
     //Set sprite properties
 
     //Load background music
@@ -25,11 +22,14 @@ int main(int argc, char* argv[]) {
     //Begin Game Loop
     while(ProgramIsRunning()) {
         //Check for input
-        const uint8_t* keys = SDL_GetKeyboardState(NULL); //Pass the keypresses
+        const uint8_t* keys = SDL_GetKeyboardState(NULL); //Get keypresses for current frame
 
+        //Game logic here
         //Update sprite states
 
-        //Draw the screen
+        RunGame();  //Update and draw the current frame
+
+        //Game logic here
 
 
     }//End Game Loop

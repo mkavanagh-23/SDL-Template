@@ -74,7 +74,10 @@ bool ProgramIsRunning() {
     return running;
 };
 
-void RunGame();
+void RunGame() {
+    sprite.move();
+    DrawGame();
+}
 
 void DrawGame() {
     //Clear the window
@@ -89,4 +92,9 @@ void DrawGame() {
 }
 
 void ResetGame();
-void CloseShop();
+
+void CloseShop() {  //Textures are automatically destroyed when objects go out of scope
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(gameWindow);
+    SDL_Quit();
+}
