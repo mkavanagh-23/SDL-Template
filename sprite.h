@@ -7,22 +7,6 @@
 #include "game.h"
 #include "settings.h"
 
-//Enum type to refer to movement directions by name
-enum Direction {
-  up,       // == 0
-  right,    // == 1
-  down,     // == 2
-  left,     // == 3
-  still     // == 4
-};
-
-//Enum type to hold R,G,B color values as one object (default white)
-struct RGB {
-    uint8_t r{255};
-    uint8_t g{255};
-    uint8_t b{255};
-};
-
 //Hold all varibles and functions for sprites
 class Sprite {
     public:
@@ -53,6 +37,7 @@ class Sprite {
         //No transparency
         Sprite(const char* filePath);
         //Transparency
+        Sprite(RGB colorKey);
         Sprite(const char* filePath, RGB colorKey);
         Sprite(const char* filePath, std::string colorHex);
         
@@ -65,7 +50,7 @@ class Sprite {
         SDL_Surface* LoadImage(const char* path);                   //Load image onto surface
         SDL_Texture* LoadTexture();                              //Load surface onto texture
         void setTransparentColor();                              //Set transparency
-        RGB HexToRGB(const std::string& hex);                   //Convert hex color codes to RGB color object
+
         void keepInBounds();                            //Check for border collision and move to edge
 
         virtual void setDirection(const uint8_t* keys);         //Set the sprite's current direction
@@ -136,7 +121,7 @@ class AnimatedSprite
         void setDirection(const uint8_t* keys);
         void move();
         void create(const char* filepath, SDL_Texture* texture, SDL_Rect& rectSheet, SDL_Rect& rectSprite);
-        void createTransparent(const char* filepath, SDL_Rect& rectSheet, SDL_Rect& rectSprite);
+        void createTransparent(const char* filepath, SDL_Texture* texture, SDL_Rect& rectSheet, SDL_Rect& rectSprite);
 };
 
 #endif

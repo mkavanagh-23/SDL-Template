@@ -25,6 +25,12 @@ Sprite::Sprite(const char* filePath, RGB colorKey)
     createTransparent();
 }
 
+
+//helper for animated constructor
+Sprite::Sprite(RGB colorKey) 
+    : PATH{NULL}, TRANSPARENCY_MASK{colorKey}
+{}
+
 //Transparent sprite object
 Sprite::Sprite(const char* filePath, std::string colorHex)
     : Sprite::Sprite(filePath, HexToRGB(colorHex))  //Convert hex to RGB to use in constructor
@@ -33,7 +39,6 @@ Sprite::Sprite(const char* filePath, std::string colorHex)
 //Destructor
 Sprite::~Sprite()
 {
-    PATH = NULL;
     SDL_DestroyTexture(texture);
 }
 
@@ -45,36 +50,39 @@ AnimatedSprite::AnimatedSprite(const char* filepathUp, const char* filepathRight
     //Create up
     create(filepathUp, textureSheetUp, rectSheetUp, rectUp);
     //Create right
+    create(filepathRight, textureSheetRight, rectSheetRight, rectRight);
     //Create down
+    create(filepathDown, textureSheetDown, rectSheetDown, rectDown);
     //Create left
+    create(filepathLeft, textureSheetLeft, rectSheetLeft, rectLeft);
 }
 
 //Transparency
-AnimatedSprite::AnimatedSprite(const char* filepathUp, const char* filepathRight, const char* filepathDown, const char* filepathLeft, const int numFrames, RGB colorKey) {
-
+AnimatedSprite::AnimatedSprite(const char* filepathUp, const char* filepathRight, const char* filepathDown, const char* filepathLeft, const int numFrames, RGB colorKey) 
+    : Sprite(colorKey), PATH_SHEET_UP{filepathUp}, PATH_SHEET_RIGHT{filepathRight}, PATH_SHEET_DOWN{filepathDown}, PATH_SHEET_LEFT{filepathLeft}, NUM_FRAMES{numFrames}
+{
+    //Create up
+    createTransparent(filepathUp, textureSheetUp, rectSheetUp, rectUp);
+    //Create right
+    createTransparent(filepathRight, textureSheetRight, rectSheetRight, rectRight);
+    //Create down
+    createTransparent(filepathDown, textureSheetDown, rectSheetDown, rectDown);
+    //Create left
+    createTransparent(filepathLeft, textureSheetLeft, rectSheetLeft, rectLeft);
 }
-AnimatedSprite::AnimatedSprite(const char* filepathUp, const char* filepathRight, const char* filepathDown, const char* filepathLeft, const int numFrames, std::string colorHex) {
-
-}
+AnimatedSprite::AnimatedSprite(const char* filepathUp, const char* filepathRight, const char* filepathDown, const char* filepathLeft, const int numFrames, std::string colorHex)
+    : AnimatedSprite(filepathUp, filepathRight, filepathDown, filepathLeft, numFrames, HexToRGB(colorHex))
+{}
 
 //Destructor
 AnimatedSprite::~AnimatedSprite() {
-    
+    SDL_DestroyTexture(texture);
+    SDL_DestroyTexture(textureSheetUp);
+    SDL_DestroyTexture(textureSheetRight);
+    SDL_DestroyTexture(textureSheetDown);
+    SDL_DestroyTexture(textureSheetLeft);
 }
 
-RGB Sprite::HexToRGB(const std::string& hex) {
-    //Create temporary color objects
-    std::string hexColor = hex;
-    assert(hexColor.length() == 6 && "Provided colorKey not a valid hex code.\n");
-    RGB rgbColor;
-
-    //Extract sets of two characters and convert to RGB values
-    rgbColor.r = static_cast<uint8_t>(std::stoi(hexColor.substr(0,2), nullptr, 16));
-    rgbColor.g = static_cast<uint8_t>(std::stoi(hexColor.substr(2,2), nullptr, 16));
-    rgbColor.b = static_cast<uint8_t>(std::stoi(hexColor.substr(4,2), nullptr, 16));
-
-    return rgbColor;
-}
 
 SDL_Surface* Sprite::LoadImage(const char* path) {
     tempSurface = SDL_LoadBMP(path);
@@ -144,9 +152,19 @@ void AnimatedSprite::create(const char* filepath, SDL_Texture* texture, SDL_Rect
     texture = LoadTexture();
     //Get the width and height of the texture sheet
     SDL_QueryTexture(texture, NULL, NULL, &rectSheet.w, &rectSheet.h);
-    width = rectSheetUp.w / NUM_FRAMES;
-    height = rectSheetUp.h;
+    width = rectSheet.w / NUM_FRAMES;
+    height = rectSheet.h;
     //Create the rectangle for upward-facing sprite
+    FillRect(rectSprite, x, y);
+}
+
+void AnimatedSprite::createTransparent(const char* filepath, SDL_Texture* texture, SDL_Rect& rectSheet, SDL_Rect& rectSprite) {
+    tempSurface = LoadImage(filepath);
+    setTransparentColor();
+    texture = LoadTexture();
+    SDL_QueryTexture(texture, NULL, NULL, &rectSheet.w, &rectSheet.h);
+    width = rectSheet.w / NUM_FRAMES;
+    height = rectSheet.h;
     FillRect(rectSprite, x, y);
 }
 
