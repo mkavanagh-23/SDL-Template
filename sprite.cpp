@@ -1,12 +1,11 @@
-#include "sprite.h"
-#include "settings.h"
-#include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_render.h>
-#include <SDL2/SDL_surface.h>
-#include <cstddef>
 #include <string>
 #include <iostream>
 #include <cassert>
+#include <SDL2/SDL.h>
+#include "sprite.h"
+#include "game.h"
+#include "settings.h"
 
 SDL_Surface* Sprite::tempSurface{NULL};
 
@@ -20,16 +19,10 @@ Sprite::Sprite(const char* filePath)
 
 //Transparent sprite objects
 Sprite::Sprite(const char* filePath, RGB colorKey)
-    : PATH{filePath}, TRANSPARENCY_MASK{colorKey}
+    : PATH{filePath}, transparencyMask{colorKey}
 {
     createTransparent();
 }
-
-
-//helper for animated constructor
-Sprite::Sprite(RGB colorKey) 
-    : PATH{NULL}, TRANSPARENCY_MASK{colorKey}
-{}
 
 //Transparent sprite object
 Sprite::Sprite(const char* filePath, std::string colorHex)
@@ -48,41 +41,40 @@ AnimatedSprite::AnimatedSprite(const char* filepathUp, const char* filepathRight
     : Sprite(), PATH_SHEET_UP{filepathUp}, PATH_SHEET_RIGHT{filepathRight}, PATH_SHEET_DOWN{filepathDown}, PATH_SHEET_LEFT{filepathLeft}, NUM_FRAMES{numFrames}
 {
     //Create up
-    create(filepathUp, textureSheetUp, rectSheetUp, rectUp);
+    create(PATH_SHEET_UP, textureSheetUp, rectSheetUp, rectUp);
     //Create right
-    create(filepathRight, textureSheetRight, rectSheetRight, rectRight);
+    create(PATH_SHEET_RIGHT, textureSheetRight, rectSheetRight, rectRight);
     //Create down
-    create(filepathDown, textureSheetDown, rectSheetDown, rectDown);
+    create(PATH_SHEET_DOWN, textureSheetDown, rectSheetDown, rectDown);
     //Create left
-    create(filepathLeft, textureSheetLeft, rectSheetLeft, rectLeft);
+    create(PATH_SHEET_LEFT, textureSheetLeft, rectSheetLeft, rectLeft);
 }
 
 //Transparency
 AnimatedSprite::AnimatedSprite(const char* filepathUp, const char* filepathRight, const char* filepathDown, const char* filepathLeft, const int numFrames, RGB colorKey) 
-    : Sprite(colorKey), PATH_SHEET_UP{filepathUp}, PATH_SHEET_RIGHT{filepathRight}, PATH_SHEET_DOWN{filepathDown}, PATH_SHEET_LEFT{filepathLeft}, NUM_FRAMES{numFrames}
+    : Sprite(), PATH_SHEET_UP{filepathUp}, PATH_SHEET_RIGHT{filepathRight}, PATH_SHEET_DOWN{filepathDown}, PATH_SHEET_LEFT{filepathLeft}, NUM_FRAMES{numFrames}
 {
+    transparencyMask = colorKey;
     //Create up
-    createTransparent(filepathUp, textureSheetUp, rectSheetUp, rectUp);
+    createTransparent(PATH_SHEET_UP, textureSheetUp, rectSheetUp, rectUp);
     //Create right
-    createTransparent(filepathRight, textureSheetRight, rectSheetRight, rectRight);
+    createTransparent(PATH_SHEET_RIGHT, textureSheetRight, rectSheetRight, rectRight);
     //Create down
-    createTransparent(filepathDown, textureSheetDown, rectSheetDown, rectDown);
+    createTransparent(PATH_SHEET_DOWN, textureSheetDown, rectSheetDown, rectDown);
     //Create left
-    createTransparent(filepathLeft, textureSheetLeft, rectSheetLeft, rectLeft);
+    createTransparent(PATH_SHEET_LEFT, textureSheetLeft, rectSheetLeft, rectLeft);
 }
 AnimatedSprite::AnimatedSprite(const char* filepathUp, const char* filepathRight, const char* filepathDown, const char* filepathLeft, const int numFrames, std::string colorHex)
     : AnimatedSprite(filepathUp, filepathRight, filepathDown, filepathLeft, numFrames, HexToRGB(colorHex))
 {}
 
 //Destructor
-AnimatedSprite::~AnimatedSprite() {
-    SDL_DestroyTexture(texture);
+AnimatedSprite::~AnimatedSprite() {     //No explicit call to base class destructor, it is implict
     SDL_DestroyTexture(textureSheetUp);
     SDL_DestroyTexture(textureSheetRight);
     SDL_DestroyTexture(textureSheetDown);
     SDL_DestroyTexture(textureSheetLeft);
 }
-
 
 SDL_Surface* Sprite::LoadImage(const char* path) {
     tempSurface = SDL_LoadBMP(path);
@@ -107,7 +99,7 @@ SDL_Texture* Sprite::LoadTexture() {
 void Sprite::setTransparentColor(){
     //Create the colorkey
     uint32_t colorKey;
-    colorKey = SDL_MapRGB(tempSurface->format, TRANSPARENCY_MASK.r, TRANSPARENCY_MASK.g, TRANSPARENCY_MASK.b);
+    colorKey = SDL_MapRGB(tempSurface->format, transparencyMask.r, transparencyMask.g, transparencyMask.b);
 
     //Set colorkey as transparent color
     SDL_SetColorKey(tempSurface, SDL_TRUE, colorKey);
@@ -166,6 +158,13 @@ void AnimatedSprite::createTransparent(const char* filepath, SDL_Texture* textur
     width = rectSheet.w / NUM_FRAMES;
     height = rectSheet.h;
     FillRect(rectSprite, x, y);
+}
+
+void Sprite::copyToRender() {
+    SDL_RenderCopy(renderer, texture, NULL, &rectPlacement);
+}
+void AnimatedSprite::copyToRender() {
+    SDL_RenderCopy(renderer, texture, &tempRect, &rectPlacement);
 }
 
 void Sprite::setDirection(const uint8_t* keys){

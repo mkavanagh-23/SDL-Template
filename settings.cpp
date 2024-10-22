@@ -1,5 +1,7 @@
-#include "settings.h"
+#include <cstdint>
 #include <cassert>
+#include <string>
+#include "settings.h"
 
 RGB HexToRGB(const std::string& hex) {
     //Create temporary color objects

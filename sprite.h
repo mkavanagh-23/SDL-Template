@@ -24,7 +24,7 @@ class Sprite {
         //Sprite attributes
         int width, height;            //Sprite width and height
         int x, y;                           //Sprite x and y coordinates
-        const RGB TRANSPARENCY_MASK{};        //ColorKey for sprite background transparency
+        RGB transparencyMask{};        //ColorKey for sprite background transparency
 
         //Movement variables
         int currentSpeed;                   //How many pixels to move the sprite by
@@ -37,12 +37,13 @@ class Sprite {
         //No transparency
         Sprite(const char* filePath);
         //Transparency
-        Sprite(RGB colorKey);
         Sprite(const char* filePath, RGB colorKey);
         Sprite(const char* filePath, std::string colorHex);
         
     //Destructor
         ~Sprite();
+
+        virtual void copyToRender();
 
     protected:
         //Function Prototypes
@@ -59,8 +60,6 @@ class Sprite {
     private:
         void create();
         void createTransparent();
-
-    private:
 };
 
 //And some additional members if the sprite is animated
@@ -103,7 +102,7 @@ class AnimatedSprite
         int currentFrame{0};         //Current frame in animation strip
         int frameCounter{0};         //frame delay
         int sheetWidth, sheetHeight;
-
+    public:
         //Constructors
         AnimatedSprite() = delete;
 
@@ -120,8 +119,12 @@ class AnimatedSprite
         //Function prototypes
         void setDirection(const uint8_t* keys);
         void move();
+        void copyToRender();
+    
+    private:
         void create(const char* filepath, SDL_Texture* texture, SDL_Rect& rectSheet, SDL_Rect& rectSprite);
         void createTransparent(const char* filepath, SDL_Texture* texture, SDL_Rect& rectSheet, SDL_Rect& rectSprite);
+
 };
 
 #endif

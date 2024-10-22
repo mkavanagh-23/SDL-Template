@@ -27,6 +27,7 @@ namespace Settings {
     
     constexpr int SCREEN_WIDTH = 800;   //Game screen width
     constexpr int SCREEN_HEIGHT = 600;  //Game screen height
+    const std::string TITLE{"Game Title"};
 
     //Animation
     constexpr int FPS = 30;                 //Frame per second

@@ -17,7 +17,6 @@ extern int scorePlayer2;
 bool InitSDL();
 bool InitGame();
 bool InitMusic();
-void CreateGameImages();
 bool ProgramIsRunning();
 void RunGame();
 void DrawGame();
