@@ -1,8 +1,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 #include <iostream>
+#include <cstdint>
 #include "game.h"
-using namespace std;
 
 int main(int argc, char* argv[]) {
 
@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
 
     //Load background music
     if(!InitMusic()) {
-        std::cout <<"Music failed to load!\n";
+        std::cout << "Music failed to load!\n";
     }
 
     //Begin Game Loop
@@ -37,5 +37,3 @@ int main(int argc, char* argv[]) {
     CloseShop();
     return 0;
 } //END MAIN FUNCTION
-
-

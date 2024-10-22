@@ -71,7 +71,7 @@ void DrawGame() {
     //Clear the window
     SDL_RenderClear(renderer);
     //Copy the background
-    SDL_RenderCopy(renderer, background.texture, NULL, &background.rectPlacement);
+    SDL_RenderCopy(renderer, background.texture, NULL, &background.rectPlacement);          // void Sprite::copyToRender(); ???
     //Copy the sprite
     SDL_RenderCopy(renderer, sprite.texture, &sprite.tempRect, &sprite.rectPlacement);
     //display the game screen with updated position of Zombie
